@@ -1,0 +1,80 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Test 1. Create
+      id: test-1-create
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Test 1. Create
+        setup-command: ''
+        command: make test-create
+        timeout: 10
+        max-score: 1
+    - name: Test 2. Add one word
+      id: test-2-add-one-word
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Test 2. Add one word
+        setup-command: ''
+        command: make test-add-one
+        timeout: 10
+        max-score: 1
+    - name: Test 3. Add overlapping
+      id: test-3-add-overlapping
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Test 3. Add overlapping
+        setup-command: ''
+        command: make test-add-overlap
+        timeout: 10
+        max-score: 2
+    - name: Test 4. Not present
+      id: test-4-not-present
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Test 4. Not present
+        setup-command: ''
+        command: make test-not-present
+        timeout: 10
+        max-score: 2
+    - name: Test 5. Present
+      id: test-5-present
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Test 5. Present
+        setup-command: ''
+        command: make test-present
+        timeout: 10
+        max-score: 2
+    - name: Test 6. Maybe present
+      id: test-6-maybe-present
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Test 6. Maybe present
+        setup-command: ''
+        command: make test-maybe-present
+        timeout: 10
+        max-score: 2
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TEST-1-CREATE_RESULTS: "${{steps.test-1-create.outputs.result}}"
+        TEST-2-ADD-ONE-WORD_RESULTS: "${{steps.test-2-add-one-word.outputs.result}}"
+        TEST-3-ADD-OVERLAPPING_RESULTS: "${{steps.test-3-add-overlapping.outputs.result}}"
+        TEST-4-NOT-PRESENT_RESULTS: "${{steps.test-4-not-present.outputs.result}}"
+        TEST-5-PRESENT_RESULTS: "${{steps.test-5-present.outputs.result}}"
+        TEST-6-MAYBE-PRESENT_RESULTS: "${{steps.test-6-maybe-present.outputs.result}}"
+      with:
+        runners: test-1-create,test-2-add-one-word,test-3-add-overlapping,test-4-not-present,test-5-present,test-6-maybe-present
